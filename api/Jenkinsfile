@@ -53,7 +53,7 @@ pipeline {
         
                     sh "docker push murali1108/api:${buildNumber}"
                     sh "docker push murali1108/api:latest"
-                    sh "docker rmi murali1108/api :${buildNumber}"
+                    sh "docker rmi murali1108/api:${buildNumber}"
                 }
             }
         } 
