@@ -25,7 +25,6 @@ pipeline {
                sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_4c0373b3d2066a06850b94ab38b6b429a9a5030e" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
-
         stage('Approval') {
             steps {
                 emailext subject: "Deployment Approval for $deployBranch branch and $deployService service",
@@ -75,6 +74,13 @@ pipeline {
                     sh "docker tag murali1108/api:${buildNumber} murali1108/api:latest"
                 }
             }
+        }
+        stage('image scanning') {
+            steps {
+                // Get the Jenkins build number
+                def buildNumber = env.BUILD_NUMBER
+                sh 'trivy image murali1108/api:${buildNumber}'
+          }
         }
         stage('Docker Login') {
             steps {
