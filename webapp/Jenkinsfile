@@ -22,7 +22,7 @@ pipeline {
         }
         stage('scanning-backend') {
             steps {
-               sh 'cd webapp && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_4c0373b3d2066a06850b94ab38b6b429a9a5030e" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+               sh 'cd webapp && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms-fe" -e SONAR_TOKEN="sqp_922a251a1b0419b96cbe43debaec924862ec1334" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
         stage('Approval') {
@@ -57,7 +57,7 @@ pipeline {
 
         stage('remove-old-container') {
             steps {
-                sh 'docker container rm -f backend'
+                sh 'docker container rm -f frontend'
                 sh 'docker rmi murali1108/webapp:latest'
             }
         }
@@ -104,7 +104,7 @@ pipeline {
         }
         stage('Docker run container') {
             steps {
-                sh 'docker run -dt --network lmsnetwork --name frontend --restart always -p 90:90 murali1108/webapp:latest'
+                sh 'docker run -dt --network lmsnetwork --name frontend --restart always -p 90:80 murali1108/webapp:latest'
             }
         }
     }
