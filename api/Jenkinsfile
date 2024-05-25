@@ -77,10 +77,12 @@ pipeline {
         }
         stage('image scanning') {
             steps {
-                // Get the Jenkins build number
-                def buildNumber = env.BUILD_NUMBER
-                sh "trivy image murali1108/api:${buildNumber}"
-          }
+                script {
+                    // Get the Jenkins build number
+                    def buildNumber = env.BUILD_NUMBER
+                    sh "trivy image murali1108/api:${buildNumber}"
+                }
+            }
         }
         stage('Docker Login') {
             steps {
@@ -102,7 +104,7 @@ pipeline {
         }
         stage('Docker run container') {
             steps {
-                sh 'docker run -dt --network lmsnetwork  --name backend  -p 8080:8080 murali1108/api:latest'
+                sh 'docker run -dt --network lmsnetwork --name backend -p 8080:8080 murali1108/api:latest'
             }
         }
     }
