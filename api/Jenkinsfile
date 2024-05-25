@@ -79,7 +79,7 @@ pipeline {
             steps {
                 // Get the Jenkins build number
                 def buildNumber = env.BUILD_NUMBER
-                sh 'trivy image murali1108/api:${buildNumber}'
+                sh "trivy image murali1108/api:${buildNumber}"
           }
         }
         stage('Docker Login') {
