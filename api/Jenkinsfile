@@ -107,5 +107,11 @@ pipeline {
                 sh 'docker run -dt --network lmsnetwork --name backend -p 8080:8080 murali1108/api:latest'
             }
         }
+        stage('Deployment-Status') {
+            steps {
+                sh 'ss -ntpl'
+                echo 'deployment done successfully'
+            }
+        }
     }
 }
