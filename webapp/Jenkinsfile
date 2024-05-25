@@ -1,0 +1,111 @@
+pipeline {
+    agent {
+        node {
+            label 'slave'
+        }
+    }
+    environment {
+        dockerhub = credentials('dockerhub')
+        deployBranch = 'main' // define your branch here
+        deployService = 'webapp-service' // define your service here
+    }
+    stages {
+        stage('slack-notification') {
+            steps {
+                slackSend channel: 'devops',
+                    color: '439FE0',
+                    message: "started ${JOB_NAME} ${BUILD_NUMBER} (<${BUILD_URL}|Open>)",
+                    teamDomain: 'dl-muraliworkspace',
+                    tokenCredentialId: 'slack',
+                    username: 'jenkins'
+            }
+        }
+        stage('scanning-backend') {
+            steps {
+               sh 'cd webapp && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_4c0373b3d2066a06850b94ab38b6b429a9a5030e" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+          }
+        }
+        stage('Approval') {
+            steps {
+                emailext subject: "Deployment Approval for $deployBranch branch and $deployService service",
+                    body: "<a href='${JENKINS_URL}/job/${JOB_NAME}/${BUILD_NUMBER}/input'>click to approve</a>",
+                    to: 'muralialakuntla3@gmail.com',
+                    mimeType: 'text/html',
+                    attachLog: true
+                script {
+                    def Delay = input id: 'Deploy',
+                        message: sh(script: '''echo "You are DEPLOYING -->$deployBranch<-- IN PRODUCTION"''', returnStdout: true).trim(),
+                        submitter: 'uaserID1, userID2',
+                        parameters: [
+                            [$class: 'ChoiceParameterDefinition',
+                                choices: ['no', 'yes'].join('\n'),
+                                name: 'input',
+                                description: 'Please Select "YES" to Build or "NO" to Abort']
+                        ]
+                    echo "The answer is: ${Delay}"
+                    if ("${Delay}" == "yes") {
+                        sh '''echo "Deploying in prod"'''
+                    } else {
+                        sh """
+                        echo "exiting not production ready branch"
+                        exit 1
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('remove-old-container') {
+            steps {
+                sh 'docker container rm -f backend'
+                sh 'docker rmi murali1108/webapp:latest'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Get the Jenkins build number
+                    def buildNumber = env.BUILD_NUMBER
+
+                    // Build the Docker image with a tag including the build number
+                    sh "cd webapp && docker build -t murali1108/webapp:${buildNumber} ."
+
+                    // Tag the new image as latest
+                    sh "docker tag murali1108/webapp:${buildNumber} murali1108/webapp:latest"
+                }
+            }
+        }
+        stage('image scanning') {
+            steps {
+                script {
+                    // Get the Jenkins build number
+                    def buildNumber = env.BUILD_NUMBER
+                    sh "trivy image murali1108/webapp:${buildNumber}"
+                }
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                sh 'echo $dockerhub_PSW | docker login -u $dockerhub_USR --password-stdin'
+            }
+        }
+
+        stage('Push Image to DockerHub') {
+            steps {
+                script {
+                    // Get the Jenkins build number
+                    def buildNumber = env.BUILD_NUMBER
+
+                    sh "docker push murali1108/webapp:${buildNumber}"
+                    sh "docker push murali1108/webapp:latest"
+                    sh "docker rmi murali1108/webapp:${buildNumber}"
+                }
+            }
+        }
+        stage('Docker run container') {
+            steps {
+                sh 'docker run -dt --network lmsnetwork --name frontend --restart always -p 90:90 murali1108/webapp:latest'
+            }
+        }
+    }
+}
