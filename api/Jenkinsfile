@@ -20,9 +20,9 @@ pipeline {
                     username: 'jenkins'
             }
         }
-        stage('scanning-backend') {
+        stage('Sonar Analysis') {
             steps {
-               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_4c0373b3d2066a06850b94ab38b6b429a9a5030e" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms-be" -e SONAR_TOKEN="sqp_cb2811fb704f063961cacf2c7136faeca45ba6b8" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
         stage('Approval') {
@@ -55,13 +55,13 @@ pipeline {
             }
         }
 
-        stage('remove-old-container') {
+        stage('Remove Old Deployment') {
             steps {
                 sh 'docker container rm -f backend'
                 sh 'docker rmi murali1108/api:latest'
             }
         }
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
                 script {
                     // Get the Jenkins build number
@@ -75,7 +75,7 @@ pipeline {
                 }
             }
         }
-        stage('image scanning') {
+        stage('Image Scanning') {
             steps {
                 script {
                     // Get the Jenkins build number
@@ -102,7 +102,7 @@ pipeline {
                 }
             }
         }
-        stage('Docker run container') {
+        stage('Deployment') {
             steps {
                 sh 'docker run -dt --network lmsnetwork --name backend -p 8080:8080 murali1108/api:latest'
             }
