@@ -10,7 +10,7 @@ pipeline {
         deployService = 'api-service' // define your service here
     }
     stages {
-        stage('slack-notification') {
+       /* stage('slack-notification') {
             steps {
                 slackSend channel: 'jenkins',
                     color: '439FE0',
@@ -19,7 +19,7 @@ pipeline {
                     tokenCredentialId: 'E9bakLtTp6Ei87epAdbRrIaQ',
                     username: 'teja m'
             }
-        }
+        }*/
         stage('Sonar Analysis') {
             steps {
                sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://65.0.92.242:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_f3963a59f1967c2357e00ec49702496530c08132" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
