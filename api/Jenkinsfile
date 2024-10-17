@@ -17,7 +17,7 @@ pipeline {
                     message: "started ${JOB_NAME} ${BUILD_NUMBER} (<${BUILD_URL}|Open>)",
                     teamDomain: 'devops-vf01484',
                     tokenCredentialId: 'E9bakLtTp6Ei87epAdbRrIaQ',
-                    username: 'jenkins'
+                    username: 'teja m'
             }
         }
         stage('Sonar Analysis') {
