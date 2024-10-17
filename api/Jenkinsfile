@@ -55,12 +55,12 @@ pipeline {
             }
         }
 
-        stage('Remove Old Deployment') {
+        /*stage('Remove Old Deployment') {
             steps {
                 sh 'docker container rm -f backend'
                 sh 'docker rmi chocolate123/api:latest'
             }
-        }
+        }*/
         stage('Build') {
             steps {
                 script {
