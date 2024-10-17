@@ -58,7 +58,7 @@ pipeline {
         stage('Remove Old Deployment') {
             steps {
                 sh 'docker container rm -f backend'
-                sh 'docker rmi murali1108/api:latest'
+                sh 'docker rmi chocolate123/api:latest'
             }
         }
         stage('Build') {
@@ -68,10 +68,10 @@ pipeline {
                     def buildNumber = env.BUILD_NUMBER
 
                     // Build the Docker image with a tag including the build number
-                    sh "cd api && docker build -t murali1108/api:${buildNumber} ."
+                    sh "cd api && docker build -t chocolate123/api:${buildNumber} ."
 
                     // Tag the new image as latest
-                    sh "docker tag murali1108/api:${buildNumber} murali1108/api:latest"
+                    sh "docker tag chocolate123/api:${buildNumber} chocolate123/api:latest"
                 }
             }
         }
@@ -80,7 +80,7 @@ pipeline {
                 script {
                     // Get the Jenkins build number
                     def buildNumber = env.BUILD_NUMBER
-                    sh "trivy image murali1108/api:${buildNumber}"
+                    sh "trivy image chocolate123/api:${buildNumber}"
                 }
             }
         }
@@ -96,15 +96,15 @@ pipeline {
                     // Get the Jenkins build number
                     def buildNumber = env.BUILD_NUMBER
 
-                    sh "docker push murali1108/api:${buildNumber}"
-                    sh "docker push murali1108/api:latest"
-                    sh "docker rmi murali1108/api:${buildNumber}"
+                    sh "docker push chocolate123/api:${buildNumber}"
+                    sh "docker push chocolate123/api:latest"
+                    sh "docker rmi chocolate123/api:${buildNumber}"
                 }
             }
         }
         stage('Deployment') {
             steps {
-                sh 'docker run -dt --network lmsnetwork --name backend -p 8080:8080 murali1108/api:latest'
+                sh 'docker run -dt --network lmsnetwork --name backend -p 8080:8080 chocolate123/api:latest'
             }
         }
         stage('Deployment-Status') {
