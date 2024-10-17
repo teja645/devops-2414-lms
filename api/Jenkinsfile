@@ -12,24 +12,24 @@ pipeline {
     stages {
         stage('slack-notification') {
             steps {
-                slackSend channel: 'devops',
+                slackSend channel: 'jenkins',
                     color: '439FE0',
                     message: "started ${JOB_NAME} ${BUILD_NUMBER} (<${BUILD_URL}|Open>)",
-                    teamDomain: 'dl-muraliworkspace',
-                    tokenCredentialId: 'slack',
+                    teamDomain: 'devops-vf01484',
+                    tokenCredentialId: 'E9bakLtTp6Ei87epAdbRrIaQ',
                     username: 'jenkins'
             }
         }
         stage('Sonar Analysis') {
             steps {
-               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms-be" -e SONAR_TOKEN="sqp_cb2811fb704f063961cacf2c7136faeca45ba6b8" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://65.0.92.242:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_f3963a59f1967c2357e00ec49702496530c08132" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
         stage('Approval') {
             steps {
                 emailext subject: "Deployment Approval for $deployBranch branch and $deployService service",
                     body: "<a href='${JENKINS_URL}/job/${JOB_NAME}/${BUILD_NUMBER}/input'>click to approve</a>",
-                    to: 'muralialakuntla3@gmail.com',
+                    to: 'mteja44333@gmail.com',
                     mimeType: 'text/html',
                     attachLog: true
                 script {
