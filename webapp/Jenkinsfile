@@ -10,7 +10,7 @@ pipeline {
         deployService = 'webapp-service' // define your service here
     }
     stages {
-        stage('slack-notification') {
+      /*  stage('slack-notification') {
             steps {
                 slackSend channel: 'devops',
                     color: '439FE0',
@@ -19,17 +19,17 @@ pipeline {
                     tokenCredentialId: 'slack',
                     username: 'jenkins'
             }
-        }
+        }*/
         stage('scanning-backend') {
             steps {
-               sh 'cd webapp && docker run --rm -e SONAR_HOST_URL="http://3.91.188.65:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms-fe" -e SONAR_TOKEN="sqp_922a251a1b0419b96cbe43debaec924862ec1334" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+               sh 'cd webapp && docker run --rm -e SONAR_HOST_URL="http://13.201.64.104:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms-fe" -e SONAR_TOKEN="sqp_2f09798e9788838f87d776cc302c8dc795f8bcf3" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
         stage('Approval') {
             steps {
                 emailext subject: "Deployment Approval for $deployBranch branch and $deployService service",
                     body: "<a href='${JENKINS_URL}/job/${JOB_NAME}/${BUILD_NUMBER}/input'>click to approve</a>",
-                    to: 'muralialakuntla3@gmail.com',
+                    to: 'mteja4433@gmail.com',
                     mimeType: 'text/html',
                     attachLog: true
                 script {
@@ -58,7 +58,7 @@ pipeline {
         stage('remove-old-container') {
             steps {
                 sh 'docker container rm -f frontend'
-                sh 'docker rmi murali1108/webapp:latest'
+                sh 'docker rmi chocolate123/webapp:latest'
             }
         }
         stage('Build Docker Image') {
@@ -68,10 +68,10 @@ pipeline {
                     def buildNumber = env.BUILD_NUMBER
 
                     // Build the Docker image with a tag including the build number
-                    sh "cd webapp && docker build -t murali1108/webapp:${buildNumber} ."
+                    sh "cd webapp && docker build -t chocolate123/webapp:${buildNumber} ."
 
                     // Tag the new image as latest
-                    sh "docker tag murali1108/webapp:${buildNumber} murali1108/webapp:latest"
+                    sh "docker tag chocolate123/webapp:${buildNumber} chocolate123/webapp:latest"
                 }
             }
         }
@@ -80,7 +80,7 @@ pipeline {
                 script {
                     // Get the Jenkins build number
                     def buildNumber = env.BUILD_NUMBER
-                    sh "trivy image murali1108/webapp:${buildNumber}"
+                    sh "trivy image chocolate123/webapp:${buildNumber}"
                 }
             }
         }
@@ -96,15 +96,15 @@ pipeline {
                     // Get the Jenkins build number
                     def buildNumber = env.BUILD_NUMBER
 
-                    sh "docker push murali1108/webapp:${buildNumber}"
-                    sh "docker push murali1108/webapp:latest"
-                    sh "docker rmi murali1108/webapp:${buildNumber}"
+                    sh "docker push chocolate123/webapp:${buildNumber}"
+                    sh "docker push chocolate123/webapp:latest"
+                    sh "docker rmi chocolate123/webapp:${buildNumber}"
                 }
             }
         }
         stage('Docker run container') {
             steps {
-                sh 'docker run -dt --network lmsnetwork --name frontend --restart always -p 90:80 murali1108/webapp:latest'
+                sh 'docker run -dt --network lmsnetwork --name frontend --restart always -p 80:80 chocolate123/webapp:latest'
             }
         }
     }
