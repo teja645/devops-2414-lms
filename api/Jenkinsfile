@@ -22,14 +22,14 @@ pipeline {
         }*/
         stage('Sonar Analysis') {
             steps {
-               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http://13.201.52.13:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_f3963a59f1967c2357e00ec49702496530c08132" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
+               sh 'cd api && docker run --rm -e SONAR_HOST_URL="http:/13.201.64.104:9000" -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=lms" -e SONAR_TOKEN="sqp_f3963a59f1967c2357e00ec49702496530c08132" -v ".:/usr/src" sonarsource/sonar-scanner-cli'
           }
         }
         stage('Approval') {
             steps {
                 emailext subject: "Deployment Approval for $deployBranch branch and $deployService service",
                     body: "<a href='${JENKINS_URL}/job/${JOB_NAME}/${BUILD_NUMBER}/input'>click to approve</a>",
-                    to: 'mteja44333@gmail.com',
+                    to: 'mteja4433@gmail.com',
                     mimeType: 'text/html',
                     attachLog: true
                 script {
@@ -55,12 +55,12 @@ pipeline {
             }
         }
 
-        /*stage('Remove Old Deployment') {
+        stage('Remove Old Deployment') {
             steps {
                 sh 'docker container rm -f backend'
                 sh 'docker rmi chocolate123/api:latest'
             }
-        }*/
+        }
         stage('Build') {
             steps {
                 script {
